@@ -6,6 +6,8 @@ import java.math.*;
 public class P2PTCP {
 
 	private static BigInteger d, N;
+	private static String E, n;
+	private static int secretNumber;
 
 	public static void main(String[] args) {
 		Scanner scan;
@@ -96,10 +98,26 @@ public class P2PTCP {
 				out.println("#" + E + "#" + N + "#");
 				out.flush();
 				scan = new Scanner(peerConnectionSocket.getInputStream());
-				String fromSocket;
-				while ((fromSocket = scan.nextLine()) != null) {
-					System.out.println(fromSocket);
-					System.out.println(decrypt(fromSocket));
+				String publicKey, tmp2;
+				if ((publicKey = scan.nextLine()) != null) {
+					System.out.println(publicKey);
+					sscanf(publicKey);
+
+				}
+				// Steg 5
+				Random r = new Random();
+
+				secretNumber = r.nextInt(1000) + 1;
+				System.out.println("Made secretNumber: " + secretNumber);
+				out.println(encrypt("" + secretNumber));
+				out.flush();
+
+				if ((tmp2 = scan.nextLine()) != null)
+					System.out.println(tmp2);
+
+				if (secretNumber == Integer.parseInt(tmp2)) {
+					System.out.println("Safe communication");
+
 				}
 
 			} catch (IOException e) {
@@ -137,6 +155,18 @@ public class P2PTCP {
 		msg = msg.modPow(d, N);
 
 		return msg.toString();
+	}
+
+	public static String encrypt(String str) {
+
+		BigInteger C = new BigInteger(str);
+		BigInteger publicE = new BigInteger(E);
+		BigInteger publicN = new BigInteger(n);
+
+		C = C.modPow(publicE, publicN);
+
+		return C.toString();
+
 	}
 
 	public static BigInteger generatePrimes(BigInteger size) {
