@@ -20,7 +20,7 @@ public class P2PTCP {
 
 		boolean foundE = false;
 		boolean foundD = false;
-		
+
 
 		if (args[0].equals("server")) {
 			try {
@@ -101,7 +101,7 @@ public class P2PTCP {
 
 				scan = new Scanner(peerConnectionSocket.getInputStream());
 				String fromSocket;
-				
+
 				if ((fromSocket = scan.nextLine()) != null) {
 					System.out.println(fromSocket);
 					System.out.println(decrypt(fromSocket));
@@ -181,7 +181,7 @@ public class P2PTCP {
 		}
 	}
 
-	public BigInteger approxSqrt(BigInteger value) {
+	public static BigInteger approxSqrt(BigInteger value) {
 		BigInteger square = new BigInteger("0");
 		BigInteger i = new BigInteger("0");
 
