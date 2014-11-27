@@ -6,6 +6,8 @@ import java.math.*;
 public class P2PTCP {
 
 	private static BigInteger d, N;
+	private static String E, n;
+	private static int secretNumber;
 
 	public static void main(String[] args) {
 		Scanner scan;
@@ -18,6 +20,7 @@ public class P2PTCP {
 
 		boolean foundE = false;
 		boolean foundD = false;
+		
 
 		if (args[0].equals("server")) {
 			try {
@@ -95,11 +98,36 @@ public class P2PTCP {
 						peerConnectionSocket.getOutputStream());
 				out.println("#" + E + "#" + N + "#");
 				out.flush();
+
 				scan = new Scanner(peerConnectionSocket.getInputStream());
 				String fromSocket;
-				while ((fromSocket = scan.nextLine()) != null) {
+				
+				if ((fromSocket = scan.nextLine()) != null) {
 					System.out.println(fromSocket);
 					System.out.println(decrypt(fromSocket));
+					out.println(decrypt(fromSocket));
+					out.flush();
+				}
+				String publicKey, tmp2;
+				if ((publicKey = scan.nextLine()) != null) {
+					System.out.println(publicKey);
+					sscanf(publicKey);
+
+				}
+				// Steg 5
+				Random r = new Random();
+
+				secretNumber = r.nextInt(1000) + 1;
+				System.out.println("Made secretNumber: " + secretNumber);
+				out.println(encrypt("" + secretNumber));
+				out.flush();
+
+				if ((tmp2 = scan.nextLine()) != null)
+					System.out.println(tmp2);
+
+				if (secretNumber == Integer.parseInt(tmp2)) {
+					System.out.println("Safe communication");
+
 				}
 
 			} catch (IOException e) {
@@ -130,6 +158,7 @@ public class P2PTCP {
 		}
 	}
 
+	// could return BigInteger instead?
 	public static String decrypt(String ciphertext) {
 
 		BigInteger msg = new BigInteger(ciphertext);
@@ -166,5 +195,35 @@ public class P2PTCP {
 		}
 
 		return i;
+	}
+
+	public static void sscanf(String publicKey) {
+
+		Pattern p = Pattern.compile("#(\\d+)#(\\d+)#");
+		Matcher m = p.matcher(publicKey);
+
+		while (m.find()) {
+
+			if (m.group().length() != 0) {
+				E = m.group(1);
+				N = m.group(2);
+			}
+
+		}
+		System.out.println("E " + E);
+		System.out.println("N " + N);
+
+	}
+
+	public static String encrypt(String str) {
+
+		BigInteger C = new BigInteger(str);
+		BigInteger publicE = new BigInteger(E);
+		BigInteger publicN = new BigInteger(N);
+
+		C = C.modPow(publicE, publicN);
+
+		return C.toString();
+
 	}
 }
